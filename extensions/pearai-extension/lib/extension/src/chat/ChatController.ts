@@ -79,7 +79,9 @@ export class ChatController {
 				break;
 			}
 			case "clickCollapsedConversation": {
-				const conversation = this.chatModel.getConversationById(message.data.id);
+				const conversation = this.chatModel.getConversationById(
+					message.data.id
+				);
 				if (conversation) {
 					this.chatModel.selectConversation(conversation);
 					await this.updateChatPanel();

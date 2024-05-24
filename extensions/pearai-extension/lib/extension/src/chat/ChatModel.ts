@@ -24,7 +24,7 @@ export class ChatModel {
 		if (!this.selectedConversationId) {
 			return;
 		}
-		return this.getConversationById(this.selectedConversationId)
+		return this.getConversationById(this.selectedConversationId);
 	}
 
 	deleteConversation(id: string) {
