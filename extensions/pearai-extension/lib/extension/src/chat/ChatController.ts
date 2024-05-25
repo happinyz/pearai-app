@@ -58,7 +58,7 @@ export class ChatController {
 	private async showConversation<T extends Conversation>(
 		conversation: T
 	): Promise<T> {
-		await this.chatModel.selectConversation(conversation);
+		this.chatModel.selectConversation(conversation);
 		await this.showChatPanel();
 		await this.updateChatPanel();
 
@@ -99,7 +99,7 @@ export class ChatController {
 				break;
 			}
 			case "openChat": {
-				await this.showLastSelectedConversation();
+				await this.showLastSelectedConversationOrCreateNew();
 				break;
 			}
 			case "deleteConversation": {
@@ -188,17 +188,15 @@ export class ChatController {
 		}
 	}
 
-	/**
-	 * @returns The last selected conversation.
-	 */
 	private getLastSelectedConversation() {
 		return this.chatModel.getLastSelectedConversation();
 	}
 
 	/**
-	 * Opens and displays the last selected conversation.
+	 * Opens and displays the last selected conversation, if one exists.
+	 * If there is no last selected conversation, creates a new one first.
 	 */
-	async showLastSelectedConversation() {
+	async showLastSelectedConversationOrCreateNew() {
 		const lastSelectedConversation = this.getLastSelectedConversation();
 		if (!lastSelectedConversation) {
 			await this.createConversation("chat-en");
