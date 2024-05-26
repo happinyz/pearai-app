@@ -8,6 +8,7 @@ import { ConversationTypesProvider } from "./conversation/ConversationTypesProvi
 import { DiffEditorManager } from "./diff/DiffEditorManager";
 import { indexRepository } from "./index/indexRepository";
 import { getVSCodeLogLevel, LoggerUsingVSCodeOutput } from "./logger";
+import { PEAR_AI_COMMAND_PREFIX } from "./utils/constants";
 
 export const activate = async (context: vscode.ExtensionContext) => {
 	const apiKeyManager = new ApiKeyManager({
@@ -22,7 +23,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
 		level: getVSCodeLogLevel(),
 	});
 	vscode.workspace.onDidChangeConfiguration((event) => {
-		if (event.affectsConfiguration("pearai.logger.level")) {
+		if (event.affectsConfiguration(`${PEAR_AI_COMMAND_PREFIX}.logger.level`)) {
 			vscodeLogger.setLevel(getVSCodeLogLevel());
 		}
 	});
@@ -65,70 +66,122 @@ export const activate = async (context: vscode.ExtensionContext) => {
 	);
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider("pearai.chat", chatPanel),
+		vscode.window.registerWebviewViewProvider(
+			`${PEAR_AI_COMMAND_PREFIX}.chat`,
+			chatPanel
+		),
 		vscode.commands.registerCommand(
-			"pearai.enterOpenAIApiKey",
+			`${PEAR_AI_COMMAND_PREFIX}.enterOpenAIApiKey`,
 			apiKeyManager.enterOpenAIApiKey.bind(apiKeyManager)
 		),
-		vscode.commands.registerCommand("pearai.clearOpenAIApiKey", async () => {
-			await apiKeyManager.clearOpenAIApiKey();
-			vscode.window.showInformationMessage("OpenAI API key cleared.");
-		}),
-
-		vscode.commands.registerCommand("pearai.startConversation", (templateId) =>
-			chatController.createConversation(templateId)
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.clearOpenAIApiKey`,
+			async () => {
+				await apiKeyManager.clearOpenAIApiKey();
+				vscode.window.showInformationMessage("OpenAI API key cleared.");
+			}
 		),
 
-		vscode.commands.registerCommand("pearai.diagnoseErrors", () => {
-			chatController.createConversation("diagnose-errors");
-		}),
-		vscode.commands.registerCommand("pearai.explainCode", () => {
-			chatController.createConversation("explain-code");
-		}),
-		vscode.commands.registerCommand("pearai.findBugs", () => {
-			chatController.createConversation("find-bugs");
-		}),
-		vscode.commands.registerCommand("pearai.generateCode", () => {
-			chatController.createConversation("generate-code");
-		}),
-		vscode.commands.registerCommand("pearai.generateUnitTest", () => {
-			chatController.createConversation("generate-unit-test");
-		}),
-		vscode.commands.registerCommand("pearai.startChat", () => {
-			chatController.createConversation("chat-en");
-		}),
-		vscode.commands.registerCommand("pearai.openChat", () => {
-			chatController.showLastSelectedConversationOrCreateNew();
-		}),
-		vscode.commands.registerCommand("pearai.editCode", () => {
-			chatController.createConversation("edit-code");
-		}),
-		vscode.commands.registerCommand("pearai.touchBar.startChat", () => {
-			chatController.createConversation("chat-en");
-		}),
-		vscode.commands.registerCommand("pearai.showChatPanel", async () => {
-			await chatController.showChatPanel();
-		}),
-		vscode.commands.registerCommand("pearai.getStarted", async () => {
-			await vscode.commands.executeCommand("workbench.action.openWalkthrough", {
-				category: `pearai.pearai-extension#pearai`,
-			});
-		}),
-		vscode.commands.registerCommand("pearai.reloadTemplates", async () => {
-			await conversationTypesProvider.loadConversationTypes();
-			vscode.window.showInformationMessage("PearAI templates reloaded.");
-		}),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.startConversation`,
+			(templateId) => chatController.createConversation(templateId)
+		),
 
-		vscode.commands.registerCommand("pearai.showLogs", () => {
-			mainOutputChannel.show(true);
-		}),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.diagnoseErrors`,
+			() => {
+				chatController.createConversation("diagnose-errors");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.explainCode`,
+			() => {
+				chatController.createConversation("explain-code");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.findBugs`,
+			() => {
+				chatController.createConversation("find-bugs");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.generateCode`,
+			() => {
+				chatController.createConversation("generate-code");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.generateUnitTest`,
+			() => {
+				chatController.createConversation("generate-unit-test");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.startChat`,
+			() => {
+				chatController.createConversation("chat-en");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.openChat`,
+			() => {
+				chatController.showLastSelectedConversationOrCreateNew();
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.editCode`,
+			() => {
+				chatController.createConversation("edit-code");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.touchBar.startChat`,
+			() => {
+				chatController.createConversation("chat-en");
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.showChatPanel`,
+			async () => {
+				await chatController.showChatPanel();
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.getStarted`,
+			async () => {
+				await vscode.commands.executeCommand(
+					"workbench.action.openWalkthrough",
+					{
+						category: `${PEAR_AI_COMMAND_PREFIX}.pearai-extension#pearai`,
+					}
+				);
+			}
+		),
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.reloadTemplates`,
+			async () => {
+				await conversationTypesProvider.loadConversationTypes();
+				vscode.window.showInformationMessage("PearAI templates reloaded.");
+			}
+		),
 
-		vscode.commands.registerCommand("pearai.indexRepository", () => {
-			indexRepository({
-				ai: ai,
-				outputChannel: indexOutputChannel,
-			});
-		})
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.showLogs`,
+			() => {
+				mainOutputChannel.show(true);
+			}
+		),
+
+		vscode.commands.registerCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.indexRepository`,
+			() => {
+				indexRepository({
+					ai: ai,
+					outputChannel: indexOutputChannel,
+				});
+			}
+		)
 	);
 
 	return Object.freeze({

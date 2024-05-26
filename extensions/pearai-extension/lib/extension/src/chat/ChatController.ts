@@ -7,6 +7,7 @@ import { resolveVariables } from "../conversation/input/resolveVariables";
 import { DiffEditorManager } from "../diff/DiffEditorManager";
 import { ChatModel } from "./ChatModel";
 import { ChatPanel } from "./ChatPanel";
+import { ChatActions, PEAR_AI_COMMAND_PREFIX } from "../utils/constants";
 
 export class ChatController {
 	private readonly chatPanel: ChatPanel;
@@ -66,7 +67,9 @@ export class ChatController {
 	}
 
 	async showChatPanel() {
-		await vscode.commands.executeCommand("pearai.chat.focus");
+		await vscode.commands.executeCommand(
+			`${PEAR_AI_COMMAND_PREFIX}.chat.focus`
+		);
 	}
 
 	async receivePanelMessage(rawMessage: unknown) {
@@ -74,11 +77,13 @@ export class ChatController {
 		const type = message.type;
 
 		switch (type) {
-			case "enterOpenAIApiKey": {
-				await vscode.commands.executeCommand("pearai.enterOpenAIApiKey");
+			case ChatActions.ENTER_OPENAI_KEY: {
+				await vscode.commands.executeCommand(
+					`${PEAR_AI_COMMAND_PREFIX}.${ChatActions.ENTER_OPENAI_KEY}`
+				);
 				break;
 			}
-			case "clickCollapsedConversation": {
+			case ChatActions.CLICK_COLLAPSED_CONVERSATION: {
 				const conversation = this.chatModel.getConversationById(
 					message.data.id
 				);
@@ -88,47 +93,47 @@ export class ChatController {
 				}
 				break;
 			}
-			case "sendMessage": {
+			case ChatActions.SEND_MESSAGE: {
 				await this.chatModel
 					.getConversationById(message.data.id)
 					?.answer(message.data.message);
 				break;
 			}
-			case "startChat": {
+			case ChatActions.START_CHAT: {
 				await this.createConversation(this.basicChatTemplateId);
 				break;
 			}
-			case "openChat": {
+			case ChatActions.OPEN_CHAT: {
 				await this.showLastSelectedConversationOrCreateNew();
 				break;
 			}
-			case "deleteConversation": {
+			case ChatActions.DELETE_CONVERSATION: {
 				this.chatModel.deleteConversation(message.data.id);
 				await this.updateChatPanel();
 				break;
 			}
-			case "exportConversation": {
+			case ChatActions.EXPORT_CONVERSATION: {
 				await this.chatModel
 					.getConversationById(message.data.id)
 					?.exportMarkdown();
 				break;
 			}
-			case "retry": {
+			case ChatActions.RETRY: {
 				await this.chatModel.getConversationById(message.data.id)?.retry();
 				break;
 			}
-			case "dismissError":
+			case ChatActions.DISMISS_ERROR:
 				await this.chatModel
 					.getConversationById(message.data.id)
 					?.dismissError();
 				break;
-			case "insertPromptIntoEditor":
+			case ChatActions.INSERT_PROMPT_INTO_EDITOR:
 				await this.chatModel
 					.getConversationById(message.data.id)
 					?.insertPromptIntoEditor();
 				break;
-			case "applyDiff":
-			case "reportError": {
+			case ChatActions.APPLY_DIFF:
+			case ChatActions.REPORT_ERROR: {
 				// Architecture debt: there are 2 views, but 1 outgoing message type
 				// These are handled in the Conversation
 				break;
