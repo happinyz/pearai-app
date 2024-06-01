@@ -1,62 +1,63 @@
 import zod from "zod";
 import { errorSchema } from "./ErrorSchema";
+import { ChatActions } from "../../../extension/src/utils/constants";
 
 export const outgoingMessageSchema = zod.discriminatedUnion("type", [
 	zod.object({
-		type: zod.literal("startChat"),
+		type: zod.literal(ChatActions.START_CHAT),
 	}),
 	zod.object({
-		type: zod.literal("openChat"),
+		type: zod.literal(ChatActions.OPEN_CHAT),
 	}),
 	zod.object({
-		type: zod.literal("enterOpenAIApiKey"),
+		type: zod.literal(ChatActions.ENTER_OPENAI_KEY),
 	}),
 	zod.object({
-		type: zod.literal("clickCollapsedConversation"),
+		type: zod.literal(ChatActions.CLICK_COLLAPSED_CONVERSATION),
 		data: zod.object({
 			id: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("deleteConversation"),
+		type: zod.literal(ChatActions.DELETE_CONVERSATION),
 		data: zod.object({
 			id: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("exportConversation"),
+		type: zod.literal(ChatActions.EXPORT_CONVERSATION),
 		data: zod.object({
 			id: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("sendMessage"),
+		type: zod.literal(ChatActions.SEND_MESSAGE),
 		data: zod.object({
 			id: zod.string(),
 			message: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("reportError"),
+		type: zod.literal(ChatActions.REPORT_ERROR),
 		error: errorSchema,
 	}),
 	zod.object({
-		type: zod.literal("dismissError"),
+		type: zod.literal(ChatActions.DISMISS_ERROR),
 		data: zod.object({
 			id: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("retry"),
+		type: zod.literal(ChatActions.RETRY),
 		data: zod.object({
 			id: zod.string(),
 		}),
 	}),
 	zod.object({
-		type: zod.literal("applyDiff"),
+		type: zod.literal(ChatActions.APPLY_DIFF),
 	}),
 	zod.object({
-		type: zod.literal("insertPromptIntoEditor"),
+		type: zod.literal(ChatActions.INSERT_PROMPT_INTO_EDITOR),
 		data: zod.object({
 			id: zod.string(),
 		}),
